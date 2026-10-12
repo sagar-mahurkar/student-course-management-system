@@ -252,3 +252,25 @@ Successful JSON responses use the standard wrapper:
 ```
 
 List endpoints return an array inside `data`. Delete endpoints return `204 No Content` without a response body.
+
+### Get Dashboard Summary
+
+- **Method:** `GET`
+- **Endpoint:** `/api/v1/dashboard/summary`
+- **Authentication:** Required (JWT)
+
+**Success Response — `200 OK`**
+
+```json
+{
+  "data": {
+    "enrolled_course_count": 3
+  }
+}
+```
+
+**Description:** Returns the total number of courses in which the authenticated student is currently enrolled.
+
+Error Responses:
+
+- `401 Unauthorized` — Missing or invalid authentication token.

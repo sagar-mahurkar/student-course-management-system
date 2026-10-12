@@ -13,6 +13,7 @@ from app.modules.health.route import health_bp
 from app.modules.auth.route import auth_bp
 from app.modules.courses.route import courses_bp
 from app.modules.enrollments.route import enrollments_bp
+from app.modules.dashboard.route import dashboard_bp
 
 
 def create_app(test_config=None):
@@ -46,5 +47,6 @@ def create_app(test_config=None):
     app.register_blueprint(auth_bp)
     app.register_blueprint(courses_bp)
     app.register_blueprint(enrollments_bp)
+    app.register_blueprint(dashboard_bp)
 
     return app
