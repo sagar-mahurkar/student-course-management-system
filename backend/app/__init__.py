@@ -11,6 +11,8 @@ from app.extensions import cors, jwt, db
 from app.errors.handlers import register_error_handlers
 from app.modules.health.route import health_bp
 from app.modules.auth.route import auth_bp
+from app.modules.courses.route import courses_bp
+from app.modules.enrollments.route import enrollments_bp
 
 
 def create_app(test_config=None):
@@ -42,5 +44,7 @@ def create_app(test_config=None):
 
     app.register_blueprint(health_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(courses_bp)
+    app.register_blueprint(enrollments_bp)
 
     return app

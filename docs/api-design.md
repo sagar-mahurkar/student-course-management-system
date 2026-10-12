@@ -145,3 +145,110 @@ Common errors:
 - Protected endpoints validate JWTs before processing requests.
 - User identity is derived from the authenticated JWT, not a client-supplied user ID.
 - Passwords and password hashes are excluded from API responses.
+
+## Course APIs
+
+All course endpoints require a valid JWT access token.
+
+### List Courses
+
+- **Method:** `GET`
+- **Endpoint:** `/api/v1/courses`
+- **Access:** Authenticated users
+- **Success:** `200 OK`
+
+Returns the course catalog.
+
+### Get Course Details
+
+- **Method:** `GET`
+- **Endpoint:** `/api/v1/courses/{course_id}`
+- **Access:** Authenticated users
+- **Success:** `200 OK`
+- **Failure:** `404 Not Found`
+
+Returns the details of a specific course.
+
+### Create Course
+
+- **Method:** `POST`
+- **Endpoint:** `/api/v1/courses`
+- **Access:** Admin only
+- **Success:** `201 Created`
+- **Failure:** `400 Bad Request`, `403 Forbidden`
+
+Request body:
+
+```json
+{
+  "title": "Python Fundamentals",
+  "description": "Learn Python basics",
+  "instructor_name": "Test Instructor",
+  "duration_hours": 20
+}
+```
+
+### Update Course
+
+- **Method:** `PATCH`
+- **Endpoint:** `/api/v1/courses/{course_id}`
+- **Access:** Admin only
+- **Success:** `200 OK`
+- **Failure:** `400 Bad Request`, `403 Forbidden`, `404 Not Found`
+
+Only supplied fields are updated.
+
+### Delete Course
+
+- **Method:** `DELETE`
+- **Endpoint:** `/api/v1/courses/{course_id}`
+- **Access:** Admin only
+- **Success:** `204 No Content`
+- **Failure:** `400 Bad Request`, `403 Forbidden`, `404 Not Found`
+
+Courses with existing enrollments cannot be deleted.
+
+## Enrollment APIs
+
+All enrollment endpoints require a valid JWT access token. The user ID is derived from the authenticated JWT identity.
+
+### List My Enrollments
+
+- **Method:** `GET`
+- **Endpoint:** `/api/v1/enrollments`
+- **Access:** Authenticated user
+- **Success:** `200 OK`
+
+Returns only the authenticated user's enrollments.
+
+### Enroll in a Course
+
+- **Method:** `POST`
+- **Endpoint:** `/api/v1/enrollments/{course_id}`
+- **Access:** Authenticated user
+- **Success:** `201 Created`
+- **Failure:** `400 Bad Request`, `404 Not Found`
+
+Creates an enrollment for the authenticated user. Duplicate enrollments are rejected.
+
+### Unenroll from a Course
+
+- **Method:** `DELETE`
+- **Endpoint:** `/api/v1/enrollments/{enrollment_id}`
+- **Access:** Enrollment owner
+- **Success:** `204 No Content`
+- **Failure:** `404 Not Found`
+
+Deletes the enrollment only if it belongs to the authenticated user.
+
+## Response Format
+
+Successful JSON responses use the standard wrapper:
+
+```json
+{
+  "data": {}
+}
+```
+
+List endpoints return an array inside `data`. Delete endpoints return `204 No Content` without a response body.
