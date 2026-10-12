@@ -1,6 +1,7 @@
 from flask import Flask
 from dotenv import load_dotenv
 
+from app import models
 from app.database.initializer import initialize_database
 
 load_dotenv()
