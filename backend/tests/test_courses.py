@@ -184,3 +184,66 @@ def test_course_with_enrollments_cannot_be_deleted(client, app):
     )
 
     assert response.status_code == 400
+
+def test_student_cannot_delete_course(client, app):
+    token, _ = _create_user(app)
+    course_id = _create_course(app)
+
+    response = client.delete(
+        f"/api/v1/courses/{course_id}",
+        headers=_auth_header(token),
+    )
+
+    assert response.status_code == 403
+
+    # Verify the course still exists.
+    get_response = client.get(
+        f"/api/v1/courses/{course_id}",
+        headers=_auth_header(token),
+    )
+
+    assert get_response.status_code == 200
+    assert get_response.get_json()["data"]["id"] == course_id
+
+
+def test_get_course_requires_authentication(client, app):
+    course_id = _create_course(app)
+
+    response = client.get(f"/api/v1/courses/{course_id}")
+
+    assert response.status_code == 401
+
+
+def test_token_without_role_cannot_create_course(client, app):
+    with app.app_context():
+        token = create_access_token(identity=str(uuid4()))
+
+    response = client.post(
+        "/api/v1/courses",
+        headers=_auth_header(token),
+        json={
+            "title": "Python Fundamentals",
+            "description": "Learn Python basics",
+            "instructor_name": "Test Instructor",
+            "duration_hours": 20,
+        },
+    )
+
+    assert response.status_code == 403
+
+
+def test_admin_cannot_create_course_with_invalid_payload(client, app):
+    token, _ = _create_user(app, role="admin")
+
+    response = client.post(
+        "/api/v1/courses",
+        headers=_auth_header(token),
+        json={
+            "title": "",
+            "description": "Learn Python basics",
+            "instructor_name": "Test Instructor",
+            "duration_hours": 20,
+        },
+    )
+
+    assert response.status_code == 400
