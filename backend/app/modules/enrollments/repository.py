@@ -1,7 +1,7 @@
 
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.extensions import db
 from app.models.enrollment import Enrollment
@@ -46,3 +46,11 @@ def create_enrollment(user_id: UUID, course_id: UUID) -> Enrollment:
 def delete_enrollment(enrollment: Enrollment) -> None:
     db.session.delete(enrollment)
     db.session.flush()
+
+def count_enrollments_by_user(user_id: UUID) -> int:
+    statement = (
+        select(func.count())
+        .select_from(Enrollment)
+        .where(Enrollment.user_id == user_id)
+    )
+    return db.session.scalar(statement) or 0

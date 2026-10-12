@@ -167,3 +167,61 @@ def test_unenrolling_allows_reenrollment(client, app):
 
     assert deleted.status_code == 204
     assert second.status_code == 201
+
+def test_dashboard_summary_requires_authentication(client):
+    
+    response = client.get("/api/v1/dashboard/summary")
+
+    assert response.status_code == 401
+
+
+def test_student_can_get_dashboard_summary(client, app):
+    token, _ = _create_user(app)
+    course_id = _create_course(app)
+
+    enrollment_response = client.post(
+        f"/api/v1/enrollments/{course_id}",
+        headers=_auth_header(token),
+    )
+    assert enrollment_response.status_code == 201
+
+    response = client.get(
+        "/api/v1/dashboard/summary",
+        headers=_auth_header(token),
+    )
+
+    assert response.status_code == 200
+    assert response.get_json()["data"]["enrolled_course_count"] == 1
+
+def test_dashboard_summary_returns_zero_without_enrollments(client, app):
+    token, _ = _create_user(app)
+
+    response = client.get(
+        "/api/v1/dashboard/summary",
+        headers=_auth_header(token),
+    )
+
+    assert response.status_code == 200
+    assert response.get_json()["data"]["enrolled_course_count"] == 0
+
+
+def test_dashboard_summary_counts_only_authenticated_students_enrollments(
+    client, app
+):
+    first_token, _ = _create_user(app)
+    second_token, _ = _create_user(app)
+    course_id = _create_course(app)
+
+    enrollment_response = client.post(
+        f"/api/v1/enrollments/{course_id}",
+        headers=_auth_header(first_token),
+    )
+    assert enrollment_response.status_code == 201
+
+    response = client.get(
+        "/api/v1/dashboard/summary",
+        headers=_auth_header(second_token),
+    )
+
+    assert response.status_code == 200
+    assert response.get_json()["data"]["enrolled_course_count"] == 0

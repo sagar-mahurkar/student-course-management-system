@@ -22,6 +22,10 @@ def list_my_enrollments(user_id: str | UUID) -> list[Enrollment]:
     return repository.list_enrollments_by_user(parsed_user_id)
 
 
+def count_my_enrollments(user_id: str | UUID) -> int:
+    parsed_user_id = _parse_uuid(user_id, "user ID")
+    return repository.count_enrollments_by_user(parsed_user_id)
+
 def enroll_in_course(
     user_id: str | UUID,
     course_id: str | UUID,
