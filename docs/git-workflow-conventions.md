@@ -222,6 +222,8 @@ Requirements:
 - Do not include after-merge commands or branch-cleanup instructions.
 - Do not state that the Git workflow is pending.
 - Do not claim that the phase is fully complete before the required workflow finishes.
+- Use the prepared extended description as the merge commit message or description when creating the regular merge commit. Format it as individual bullet points where supported.
+- Do not use the extended description as a squash commit message because **Squash and merge is not permitted** in this workflow.
 
 The final completion statement describes the implementation milestone being merged. Actual phase completion must still be confirmed after the PR is merged and the post-merge workflow is finished.
 
@@ -234,10 +236,17 @@ Before merging:
 3. Verify the implementation and checks described in the PR.
 4. Submit the prepared review comment as a PR comment or review, as appropriate.
 5. Resolve identified issues before merging.
-6. Use **Squash and merge** to keep each phase's changes together as one milestone commit.
-7. Use the prepared extended description for the merge commit description, formatted as individual bullet points.
+6. **Always select Create a merge commit. Never use Squash and merge or Rebase and merge.**
+7. Preserve the feature branch's individual commits in the resulting history on `main`.
+8. Use the prepared extended description as the merge commit message or description, formatted as individual bullet points where supported.
 
 Do not merge a PR that still has unresolved issues.
+
+### Merge strategy
+
+Use a regular merge commit to preserve individual feature-branch commits and explicitly record the integration of each phase into `main`.
+
+This is the mandatory merge strategy for all project phases.
 
 ## 8. Post-Merge Workflow
 
@@ -310,5 +319,12 @@ Before PR submission, always provide four separate, copyable artifacts:
 4. **Extended description for merge**, formatted pointwise and ending with `Completed Phase <N> — <Phase Name>.`
 
 After providing these artifacts, explain the GitHub PR steps and post-merge commands separately.
+
+### Merge strategy requirement
+
+- Always use **Create a merge commit** when merging a pull request.
+- Never use **Squash and merge** or **Rebase and merge**.
+- Preserve the feature branch's individual commits in the resulting history on `main`.
+- Use the prepared extended description as the merge commit message or description, formatted as individual bullet points where supported.
 
 Keep the workflow consistent across phases. Adapt the content to the actual implementation, but do not omit required artifacts or completion checks.
