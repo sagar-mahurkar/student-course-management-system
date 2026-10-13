@@ -1,43 +1,62 @@
 # Student Course Management System (SCMS)
 
-A full-stack MVP for students to discover courses and manage enrollments, and for administrators to manage the course catalog.
+## 1. Project Overview
 
-## MVP capabilities
+The Student Course Management System (SCMS) is a full-stack MVP that allows students to discover courses and manage their enrollments. Administrators can maintain the course catalog.
 
-- Student registration and login using JWT authentication.
-- Controlled administrator provisioning; public registration always creates a student account.
-- Authenticated course catalog and course detail views.
-- Admin-only course creation, update, and deletion.
-- Student enrollment, enrollment listing, and unenrollment.
-- Student dashboard with enrollment count.
-- PostgreSQL persistence.
-- Flask REST API and Vue 3 frontend.
+## 2. MVP Features
 
-## Technology stack
+### Student
 
-| Area | Technology |
-|---|---|
-| Backend | Python, Flask, Flask-JWT-Extended |
-| Validation | Pydantic |
-| ORM / database | SQLAlchemy, PostgreSQL, psycopg 3 |
-| Frontend | Vue 3, TypeScript, Vite |
-| Client state / routing | Pinia, Vue Router |
-| HTTP client / styling | Axios, Bootstrap |
-| Backend tests | pytest |
+- Register and log in.
+- Browse the course catalog and view course details.
+- Enroll in a course.
+- View personal enrollments and the dashboard enrollment count.
+- Unenroll from a course.
 
-## Repository layout
+### Administrator
+
+- Log in using a provisioned administrator account.
+- Create, view, update, and delete courses.
+- Manage the course catalog.
+- Delete a course only when it has no enrollments.
+
+### Security and Data Integrity
+
+- JWT-based authentication for protected endpoints.
+- Password hashing; passwords are never returned by the API.
+- Public registration always assigns the `student` role.
+- Backend authorization restricts course mutations to administrators.
+- Database constraints prevent duplicate emails and duplicate user-course enrollments.
+- Enrollment ownership is enforced by the backend.
+
+## 3. Technology Stack
+
+- **Backend:** Python, Flask, Flask-JWT-Extended
+- **Validation:** Pydantic
+- **ORM:** SQLAlchemy
+- **Database:** PostgreSQL
+- **Database driver:** psycopg 3
+- **Frontend:** Vue 3, TypeScript, Vite
+- **Routing:** Vue Router
+- **State management:** Pinia
+- **HTTP client:** Axios
+- **Styling:** Bootstrap
+- **Backend testing:** pytest
+
+## 4. Repository Structure
 
 ```text
 .
 ├── backend/
 │   ├── app/
-│   │   ├── config/          # Environment-backed settings
-│   │   ├── database/        # PostgreSQL database initializer
-│   │   ├── errors/          # Application errors and handlers
-│   │   ├── extensions/      # SQLAlchemy, JWT, and CORS extensions
-│   │   ├── models/          # User, Course, Enrollment
-│   │   ├── modules/         # Auth, courses, enrollments, dashboard, health
-│   │   └── seeders/         # Optional initial administrator seeder
+│   │   ├── config/
+│   │   ├── database/
+│   │   ├── errors/
+│   │   ├── extensions/
+│   │   ├── models/
+│   │   ├── modules/
+│   │   └── seeders/
 │   ├── tests/
 │   ├── requirements.txt
 │   └── run.py
@@ -59,16 +78,18 @@ A full-stack MVP for students to discover courses and manage enrollments, and fo
     └── testing-strategy.md
 ```
 
-## Prerequisites
+## 5. Prerequisites
 
-- Python version compatible with the pinned backend dependencies.
-- Node.js and npm compatible with the installed Vite toolchain.
+- Python compatible with the backend dependencies.
+- Node.js and npm compatible with the frontend dependencies.
 - PostgreSQL running locally.
-- A PostgreSQL role with permission to connect to the maintenance database and create the application database on first startup.
+- A PostgreSQL role with permission to connect to the maintenance database and create the configured application database if it does not already exist.
 
-## Local setup
+## 6. Local Setup
 
-### 1. Configure the backend
+### 6.1 Backend
+
+From the repository root:
 
 ```bash
 cd backend
@@ -78,21 +99,23 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Edit `backend/.env` and set a strong local `JWT_SECRET_KEY` and valid PostgreSQL credentials. The application reads the environment configuration and can create the configured application database if it does not exist. The PostgreSQL role therefore needs the required database-creation privilege.
+Configure `backend/.env` with the correct PostgreSQL connection settings and a strong local `JWT_SECRET_KEY`.
 
-To provision an initial administrator, intentionally set `ADMIN_SEED_ENABLED=true` and provide `ADMIN_SEED_FULL_NAME`, `ADMIN_SEED_EMAIL`, and `ADMIN_SEED_PASSWORD`. Keep this disabled unless you are provisioning the administrator. Do not commit `.env` or real secrets.
+To provision an initial administrator, enable the project's administrator seeding configuration and provide the required administrator name, email, and password. Keep seeding disabled unless it is intentionally needed. Never commit `.env` or real credentials.
 
-Start the backend from the `backend/` directory:
+Start the backend from `backend/`:
 
 ```bash
 python run.py
 ```
 
-The local API base is `http://localhost:5000`; the health endpoint is `http://localhost:5000/health`.
+- Backend base URL: `http://localhost:5000`
+- Health endpoint: `http://localhost:5000/health`
+- API prefix: `/api/v1`
 
-### 2. Configure the frontend
+### 6.2 Frontend
 
-In a second terminal:
+Open a second terminal:
 
 ```bash
 cd frontend
@@ -101,44 +124,86 @@ cp .env.example .env
 npm run dev
 ```
 
-The default frontend URL is `http://localhost:5173`. `VITE_API_BASE_URL` defaults to `http://localhost:5000/api/v1`.
+Configure the frontend API base URL to point to `http://localhost:5000/api/v1`.
 
-### 3. Verify the application
+- Default frontend URL: `http://localhost:5173`
+- Do not put private secrets in `VITE_*` variables; these values are exposed to the browser.
 
-Backend tests:
+## 7. Verification Commands
+
+### Backend tests
+
+Run from `backend/`:
 
 ```bash
-cd backend
 python -m pytest -v
 ```
 
-Frontend type-check and production build:
+### Frontend production build
+
+Run from `frontend/`:
 
 ```bash
-cd frontend
 npm run build
 ```
 
-The backend test suite was reported as passing **58 tests** during Phase 12/13 work. Full student and administrator workflows were also manually tested through the frontend. Run the commands above in the current environment when you need a fresh verification result.
+### Git review
 
-## API documentation
+Run from the repository root:
 
-See [`docs/api-design.md`](docs/api-design.md) for endpoints, payloads, authentication, and response formats.
+```bash
+git status
+git diff
+git diff --check
+```
 
-## Database documentation
+The Phase 12–13 session reported 58 passing backend tests and manual testing of student and administrator workflows through the frontend. Re-run the commands above to obtain fresh results for the current checkout.
 
-See [`docs/database-design.md`](docs/database-design.md) for entities, relationships, constraints, indexes, and integrity rules.
+## 8. Documentation
 
-## MVP scope boundaries
+- [Requirements and MVP scope](docs/requirements.md)
+- [Database design](docs/database-design.md)
+- [API design](docs/api-design.md)
+- [Testing strategy](docs/testing-strategy.md)
+- [Git workflow conventions](docs/git-workflow-conventions.md)
+- [Project playbook](docs/project-playbook.md)
 
-The MVP does not include instructor-specific accounts, assignments, grading, attendance, payments, email verification, password reset, notifications, course-content uploads, advanced search/filtering/pagination, Docker, CI/CD, or production deployment.
+## 9. MVP Scope Boundaries
 
-## Database schema lifecycle note
+The following are outside the current MVP:
 
-The current application initializes the database and creates tables through SQLAlchemy metadata (`db.create_all()`). A versioned migration workflow is not currently present in the repository. For environments where schema evolution and production deployment matter, add and review a migration tool/workflow before making schema changes.
+- Instructor-specific accounts and permissions.
+- Assignments, examinations, quizzes, and grading.
+- Attendance tracking.
+- Payments and subscriptions.
+- Email verification and password reset.
+- Notifications and messaging.
+- Course content uploads and video streaming.
+- Advanced search, filtering, pagination, and analytics.
+- Docker, CI/CD, and production deployment.
 
-## Project status
+## 10. Database Schema Lifecycle
 
-- Phase 12 — Frontend–Backend Integration: complete.
-- Phase 13 — End-to-End Testing & Bug Fixing: complete; backend suite reported at 58 passing tests and student/admin workflows manually tested through the frontend.
-- Phase 14 — Documentation & Cleanup: documentation pack prepared; perform the final repository review and verification before marking the phase complete.
+The current project documentation describes SQLAlchemy metadata-based table creation (`db.create_all()`). A versioned migration workflow is not documented as implemented. Before introducing schema changes in a persistent or production environment, add and review a migration workflow rather than relying on metadata creation alone.
+
+## 11. Project Phase Status
+
+The following status reflects the recorded project progression. For phases where a precise duration or independent verification result was not recorded, this README does not infer one.
+
+| Phase | Description | Status |
+| --- | --- | --- |
+| 0 | Git & Repository Setup | Complete |
+| 1 | Requirements & Scope | Complete |
+| 2 | Entity & Database Design | Complete |
+| 3 | Backend Setup | Complete |
+| 4 | Database Setup | Complete |
+| 5 | Backend Models | Complete |
+| 6 | API Foundation & Authentication | Complete |
+| 7 | Feature APIs | Complete |
+| 8 | Summary / Aggregation APIs | Complete |
+| 9 | Backend Testing & Hardening | Complete |
+| 10 | Frontend Setup | Complete |
+| 11 | Frontend UI | Complete |
+| 12 | Frontend–Backend Integration | Complete |
+| 13 | End-to-End Testing & Bug Fixing | Complete |
+| 14 | Documentation & Cleanup | Complete |
