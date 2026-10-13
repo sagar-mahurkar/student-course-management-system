@@ -2,7 +2,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import api from '../services/api'
+import { useAuthStore } from '../stores/auth'
 
+const authStore = useAuthStore()
 const courseCount = ref<number | null>(null)
 const enrollmentCount = ref<number | null>(null)
 const loading = ref(true)
@@ -10,18 +12,17 @@ const error = ref('')
 
 onMounted(async () => {
   try {
-    const [coursesResponse, enrollmentsResponse] = await Promise.all([
-      api.get('/courses'),
-      api.get('/enrollments'),
-    ])
-
+    const coursesResponse = await api.get('/courses')
     const courses = coursesResponse.data.data
-    const enrollments = enrollmentsResponse.data.data
-
     courseCount.value = Array.isArray(courses) ? courses.length : 0
-    enrollmentCount.value = Array.isArray(enrollments)
-      ? enrollments.length
-      : 0
+
+    if (authStore.user?.role === 'student') {
+      const enrollmentsResponse = await api.get('/enrollments')
+      const enrollments = enrollmentsResponse.data.data
+      enrollmentCount.value = Array.isArray(enrollments)
+        ? enrollments.length
+        : 0
+    }
   } catch {
     error.value = 'Unable to load dashboard information.'
   } finally {
@@ -50,13 +51,13 @@ onMounted(async () => {
             <h2 class="h5">Available Courses</h2>
             <p class="display-6 mb-3">{{ courseCount }}</p>
             <RouterLink to="/courses" class="btn btn-primary">
-              Browse Courses
+              {{ authStore.user?.role === 'admin' ? 'Manage Courses' : 'Browse Courses' }}
             </RouterLink>
           </div>
         </div>
       </div>
 
-      <div class="col-md-6">
+      <div v-if="authStore.user?.role === 'student'" class="col-md-6">
         <div class="card h-100">
           <div class="card-body">
             <h2 class="h5">My Enrollments</h2>

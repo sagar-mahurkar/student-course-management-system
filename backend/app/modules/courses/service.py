@@ -33,6 +33,14 @@ def get_course(course_id: str | UUID) -> Course:
 
 
 def create_course(data: dict) -> Course:
+    for field in ("title", "instructor_name"):
+        value = data.get(field)
+
+        if not isinstance(value, str) or not value.strip():
+            raise ValidationError(f"{field} must not be empty")
+
+        data[field] = value.strip()
+
     try:
         course = repository.create_course(
             title=data["title"],

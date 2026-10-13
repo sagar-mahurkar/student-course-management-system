@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 
 from app import models
 from app.database.initializer import initialize_database
+from app.seeders.admin_seeder import seed_admin
 
 load_dotenv()
 
@@ -26,11 +27,15 @@ def create_app(test_config=None):
     if not app.config["JWT_SECRET_KEY"]:
         raise RuntimeError("JWT_SECRET_KEY must be configured")
 
+    db.init_app(app)
+    jwt.init_app(app)
+
     if app.config.get("INITIALIZE_DATABASE", True):
         initialize_database()
 
-    db.init_app(app)
-    jwt.init_app(app)
+        with app.app_context():
+            db.create_all()
+            seed_admin(app.config)
 
     cors.init_app(
         app,
