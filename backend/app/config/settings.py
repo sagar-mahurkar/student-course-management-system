@@ -17,3 +17,11 @@ class Settings:
         "FRONTEND_ORIGIN",
         "http://localhost:5173",
     )
+
+    ADMIN_SEED_ENABLED = os.getenv(
+        "ADMIN_SEED_ENABLED",
+        "false",
+    ).strip().lower() in {"1", "true", "yes", "on"}
+    ADMIN_SEED_FULL_NAME = os.getenv("ADMIN_SEED_FULL_NAME")
+    ADMIN_SEED_EMAIL = os.getenv("ADMIN_SEED_EMAIL")
+    ADMIN_SEED_PASSWORD = os.getenv("ADMIN_SEED_PASSWORD")
