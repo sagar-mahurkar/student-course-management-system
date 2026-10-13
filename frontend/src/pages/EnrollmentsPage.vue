@@ -67,7 +67,7 @@ async function unenroll(enrollmentId: number | string) {
       Loading enrollments...
     </div>
 
-    <div v-else-if="enrollments.length === 0" class="alert alert-secondary">
+    <div v-else-if="!error && enrollments.length === 0" class="alert alert-secondary">
       You are not enrolled in any courses.
     </div>
 

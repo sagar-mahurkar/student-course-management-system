@@ -63,7 +63,7 @@ async function enroll(courseId: number | string) {
     <div v-if="error" class="alert alert-danger">{{ error }}</div>
     <div v-if="loading" class="alert alert-info">Loading courses...</div>
 
-    <div v-else-if="courses.length === 0" class="alert alert-secondary">
+    <div v-else-if="!error && courses.length === 0" class="alert alert-secondary">
       No courses are available.
     </div>
 
